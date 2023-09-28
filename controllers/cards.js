@@ -32,6 +32,9 @@ export const deleteCardById = (req, res) => {
       if (error.message === 'NotFound') {
         return res.status(404).send({ message: 'Карточка с указанным id не найдена' });
       }
+      if (error.name === 'CastError') {
+        return res.status(400).send({ message: 'Передан не валидный id' });
+      }
       return res.status(500).send({ message: 'Ошибка на стороне сервера', error });
     });
 };
@@ -40,7 +43,7 @@ export const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { runValidators: true, new: true },
+    { new: true },
   ).then((card) => {
     if (!card) {
       throw new Error('NotFound');
@@ -51,8 +54,8 @@ export const likeCard = (req, res) => {
       if (error.message === 'NotFound') {
         return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       }
-      if (error.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка', error });
+      if (error.name === 'CastError') {
+        return res.status(400).send({ message: 'Передан не валидный id' });
       }
       return res.status(500).send({ message: 'Ошибка дислайка карточки', error });
     });
@@ -62,7 +65,7 @@ export const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { runValidators: true, new: true },
+    { new: true },
   )
     .then((card) => {
       if (!card) {
@@ -74,8 +77,8 @@ export const dislikeCard = (req, res) => {
       if (error.message === 'NotFound') {
         return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       }
-      if (error.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Переданы некорректные данные для снятия лайка', error });
+      if (error.name === 'CastError') {
+        return res.status(400).send({ message: 'Передан не валидный id' });
       }
       return res.status(500).send({ message: 'Ошибка лайка карточки', error });
     });

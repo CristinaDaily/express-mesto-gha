@@ -7,7 +7,7 @@ const cardRoutes = Router();
 
 cardRoutes.get('/', getCards);
 cardRoutes.post('/', createCard);
-cardRoutes.post('/:cardId', deleteCardById);
+cardRoutes.delete('/:cardId', deleteCardById);
 cardRoutes.put('/:cardId/likes', likeCard);
 cardRoutes.delete('/:cardId/likes', dislikeCard);
 
