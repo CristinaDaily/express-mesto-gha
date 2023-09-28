@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { 
+import {
   getUsers, getUserByID, createUser, updateUser, updateAvatar,
 } from '../controllers/users.js';
 
