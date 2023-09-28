@@ -13,7 +13,7 @@ export const createCard = (req, res) => {
   Card.create({ name, link, owner })
     .then((card) => res.send(card))
     .catch((err) => {
-      if (err.name === 'ValidatorError') {
+      if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Переданы некорректные данные при создании карточки', err });
       }
       return res.status(500).send({ message: 'Ошибка на стороне сервера', err });
@@ -51,7 +51,7 @@ export const likeCard = (req, res) => {
       if (error.message === 'NotFound') {
         return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       }
-      if (error.name === 'ValidatorError') {
+      if (error.name === 'ValidationError') {
         return res.status(400).send({ message: 'Переданы некорректные данные для постановки лайка', error });
       }
       return res.status(500).send({ message: 'Ошибка дислайка карточки', error });
@@ -74,7 +74,7 @@ export const dislikeCard = (req, res) => {
       if (error.message === 'NotFound') {
         return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
       }
-      if (error.name === 'ValidatorError') {
+      if (error.name === 'ValidationError') {
         return res.status(400).send({ message: 'Переданы некорректные данные для снятия лайка', error });
       }
       return res.status(500).send({ message: 'Ошибка лайка карточки', error });

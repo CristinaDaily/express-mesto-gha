@@ -27,7 +27,7 @@ export const createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.send(user))
     .catch((error) => {
-      if (error.name === 'ValidatorError') {
+      if (error.name === 'ValidationError') {
         return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя', error });
       }
       return res.status(500).send({ message: 'Ошибка на стороне сервера', error });
@@ -47,7 +47,7 @@ export const updateUser = (req, res) => {
       if (error.message === 'NotFound') {
         return res.status(404).send({ message: 'Пользователь с указанным id не найден' });
       }
-      if (error.name === 'ValidatorError') {
+      if (error.name === 'ValidationError') {
         return res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля', error });
       }
       return res.status(500).send({ message: 'Ошибка на стороне сервера', error });
@@ -67,7 +67,7 @@ export const updateAvatar = (req, res) => {
       if (error.message === 'NotFound') {
         return res.status(404).send({ message: 'Пользователь с указанным id не найден' });
       }
-      if (error.name === 'ValidatorError') {
+      if (error.name === 'ValidationError') {
         return res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара', error });
       }
 
