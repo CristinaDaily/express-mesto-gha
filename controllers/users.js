@@ -18,8 +18,8 @@ export const getUserByID = (req, res) => {
       if (error.message === 'NotFound') {
         return res.status(404).send({ message: 'Пользователь по указанному id не найден' });
       }
-      if (error.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Переданы некорректные данные id', error });
+      if (error.name === 'CastError') {
+        return res.status(400).send({ message: 'Передан не валидный id' });
       }
       return res.status(500).send({ message: 'Ошибка на стороне сервера', error });
     });
@@ -39,7 +39,8 @@ export const createUser = (req, res) => {
 
 export const updateUser = (req, res) => {
   const userUpdates = req.body;
-  User.findByIdAndUpdate(req.user._id, { $set: userUpdates }, { new: true })
+
+  User.findByIdAndUpdate(req.user._id, { $set: userUpdates }, { runValidators: true, new: true })
     .then((user) => {
       if (!user) {
         throw new Error('NotFound');
@@ -59,7 +60,7 @@ export const updateUser = (req, res) => {
 
 export const updateAvatar = (req, res) => {
   const avatarUrl = req.body;
-  User.findByIdAndUpdate(req.user._id, avatarUrl, { new: true })
+  User.findByIdAndUpdate(req.user._id, avatarUrl, { runValidators: true, new: true })
     .then((user) => {
       if (!user) {
         throw new Error('NotFound');
