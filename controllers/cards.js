@@ -1,10 +1,12 @@
 import Card from '../models/card.js';
+import HTTP_STATUS from '../errorStatus.js';
 
+const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } = HTTP_STATUS;
 export const getCards = (req, res) => {
   Card.find({})
     .populate(['owner'])
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500).send({ message: 'Oшибка на стороне сервера', err }));
+    .catch((err) => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Oшибка на стороне сервера', err }));
 };
 
 export const createCard = (req, res) => {
@@ -14,9 +16,9 @@ export const createCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Переданы некорректные данные при создании карточки', err });
+        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки', err });
       }
-      return res.status(500).send({ message: 'Ошибка на стороне сервера', err });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на стороне сервера', err });
     });
 };
 
@@ -30,12 +32,12 @@ export const deleteCardById = (req, res) => {
     })
     .catch((error) => {
       if (error.message === 'NotFound') {
-        return res.status(404).send({ message: 'Карточка с указанным id не найдена' });
+        return res.status(NOT_FOUND).send({ message: 'Карточка с указанным id не найдена' });
       }
       if (error.name === 'CastError') {
-        return res.status(400).send({ message: 'Передан не валидный id' });
+        return res.status(BAD_REQUEST).send({ message: 'Передан не валидный id' });
       }
-      return res.status(500).send({ message: 'Ошибка на стороне сервера', error });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на стороне сервера', error });
     });
 };
 
@@ -52,12 +54,12 @@ export const likeCard = (req, res) => {
   })
     .catch((error) => {
       if (error.message === 'NotFound') {
-        return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
+        return res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
       }
       if (error.name === 'CastError') {
-        return res.status(400).send({ message: 'Передан не валидный id' });
+        return res.status(BAD_REQUEST).send({ message: 'Передан не валидный id' });
       }
-      return res.status(500).send({ message: 'Ошибка дислайка карточки', error });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка дислайка карточки', error });
     });
 };
 
@@ -75,11 +77,11 @@ export const dislikeCard = (req, res) => {
     })
     .catch((error) => {
       if (error.message === 'NotFound') {
-        return res.status(404).send({ message: 'Передан несуществующий _id карточки' });
+        return res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
       }
       if (error.name === 'CastError') {
-        return res.status(400).send({ message: 'Передан не валидный id' });
+        return res.status(BAD_REQUEST).send({ message: 'Передан не валидный id' });
       }
-      return res.status(500).send({ message: 'Ошибка лайка карточки', error });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка лайка карточки', error });
     });
 };
