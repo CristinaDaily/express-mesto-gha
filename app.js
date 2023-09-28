@@ -16,6 +16,10 @@ app.use((req, res, next) => {
 });
 app.use(router);
 
+app.use((req, res) => {
+  res.status(404).json({ message: 'Маршрут не найден' });
+});
+
 async function init() {
   await mongoose.connect(MONGO_URL);
 
