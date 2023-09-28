@@ -18,6 +18,9 @@ export const getUserByID = (req, res) => {
       if (error.message === 'NotFound') {
         return res.status(404).send({ message: 'Пользователь по указанному id не найден' });
       }
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Переданы некорректные данные id', error });
+      }
       return res.status(500).send({ message: 'Ошибка на стороне сервера', error });
     });
 };
