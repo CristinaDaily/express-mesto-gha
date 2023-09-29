@@ -5,7 +5,7 @@ const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } = HTTP_STATUS;
 export const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на стороне сервера', err }));
+    .catch((err) => res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', err }));
 };
 
 export const getUserByID = (req, res) => {
@@ -23,7 +23,7 @@ export const getUserByID = (req, res) => {
       if (error.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: 'Передан не валидный id' });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на стороне сервера', error });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
     });
 };
 
@@ -35,7 +35,7 @@ export const createUser = (req, res) => {
       if (error.name === 'ValidationError') {
         return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя', error });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на стороне сервера', error });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
     });
 };
 
@@ -56,7 +56,7 @@ export const updateUser = (req, res) => {
       if (error.name === 'ValidationError') {
         return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля', error });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на стороне сервера', error });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
     });
 };
 
@@ -77,6 +77,6 @@ export const updateAvatar = (req, res) => {
         return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении аватара', error });
       }
 
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на стороне сервера', error });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
     });
 };

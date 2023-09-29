@@ -6,7 +6,7 @@ export const getCards = (req, res) => {
   Card.find({})
     .populate(['owner'])
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(INTERNAL_SERVER_ERROR).send({ message: 'Oшибка на стороне сервера', err }));
+    .catch((err) => res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', err }));
 };
 
 export const createCard = (req, res) => {
@@ -18,7 +18,7 @@ export const createCard = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки', err });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на стороне сервера', err });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', err });
     });
 };
 
@@ -37,7 +37,7 @@ export const deleteCardById = (req, res) => {
       if (error.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: 'Передан не валидный id' });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на стороне сервера', error });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
     });
 };
 
@@ -59,7 +59,7 @@ export const likeCard = (req, res) => {
       if (error.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: 'Передан не валидный id' });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка дислайка карточки', error });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
     });
 };
 
@@ -82,6 +82,6 @@ export const dislikeCard = (req, res) => {
       if (error.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: 'Передан не валидный id' });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'Ошибка лайка карточки', error });
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
     });
 };
