@@ -39,10 +39,8 @@ export const createUser = (req, res) => {
     });
 };
 
-export const updateUser = (req, res) => {
-  const userUpdates = req.body;
-
-  User.findByIdAndUpdate(req.user._id, { $set: userUpdates }, { runValidators: true, new: true })
+const updateProfile = (req, res, updateOption) => {
+  User.findByIdAndUpdate(req.user._id, updateOption, { runValidators: true, new: true })
     .then((user) => {
       if (!user) {
         throw new Error('NotFound');
@@ -54,29 +52,18 @@ export const updateUser = (req, res) => {
         return res.status(NOT_FOUND).send({ message: 'Пользователь с указанным id не найден' });
       }
       if (error.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля', error });
+        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении', error });
       }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
     });
 };
 
+export const updateUser = (req, res) => {
+  const userUpdates = req.body;
+  updateProfile(req, res, { $set: userUpdates });
+};
+
 export const updateAvatar = (req, res) => {
   const avatarUrl = req.body;
-  User.findByIdAndUpdate(req.user._id, avatarUrl, { runValidators: true, new: true })
-    .then((user) => {
-      if (!user) {
-        throw new Error('NotFound');
-      }
-      res.send(user);
-    })
-    .catch((error) => {
-      if (error.message === 'NotFound') {
-        return res.status(NOT_FOUND).send({ message: 'Пользователь с указанным id не найден' });
-      }
-      if (error.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении аватара', error });
-      }
-
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
-    });
+  updateProfile(req, res, avatarUrl);
 };

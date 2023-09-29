@@ -41,10 +41,10 @@ export const deleteCardById = (req, res) => {
     });
 };
 
-export const likeCard = (req, res) => {
+const updateCardLikes = (req, res, updateAction) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    updateAction,
     { new: true },
   ).then((card) => {
     if (!card) {
@@ -63,25 +63,10 @@ export const likeCard = (req, res) => {
     });
 };
 
+export const likeCard = (req, res) => {
+  updateCardLikes(req, res, { $addToSet: { likes: req.user._id } });
+};
+
 export const dislikeCard = (req, res) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { new: true },
-  )
-    .then((card) => {
-      if (!card) {
-        throw new Error('NotFound');
-      }
-      res.send(card);
-    })
-    .catch((error) => {
-      if (error.message === 'NotFound') {
-        return res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
-      }
-      if (error.name === 'CastError') {
-        return res.status(BAD_REQUEST).send({ message: 'Передан не валидный id' });
-      }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
-    });
+  updateCardLikes(req, res, { $pull: { likes: req.user._id } });
 };
