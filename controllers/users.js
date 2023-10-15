@@ -1,60 +1,67 @@
+import bcrypt from 'bcryptjs';
 import User from '../models/user.js';
-import HTTP_STATUS from '../errorStatus.js';
+import generateTtoken from '../utils/jwt.js';
+import NotFoundError from '../errors/notFoundErr.js';
+import BadRequestError from '../errors/badRequestErr.js';
+import ConflictError from '../errors/conflictError.js';
+import AuthenticationError from '../errors/authenticationError.js';
 
-const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } = HTTP_STATUS;
-export const getUsers = (req, res) => {
+const SOLT_ROUNDS = 10;
+const MONGO_DUPLCATE_ERROR_CODE = 11000;
+
+export const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', err }));
+    .catch(next);
 };
 
-export const getUserByID = (req, res) => {
+export const getUserByID = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        throw new Error('NotFound');
+        throw new NotFoundError('Пользователь по указанному id не найден');
       }
       res.send(user);
     })
-    .catch((error) => {
-      if (error.message === 'NotFound') {
-        return res.status(NOT_FOUND).send({ message: 'Пользователь по указанному id не найден' });
-      }
+    .catch(next);
+  /*
       if (error.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: 'Передан не валидный id' });
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
-    });
+    }); */
 };
 
-export const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.send(user))
+export const createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, SOLT_ROUNDS).then((hash) => User.create({
+    name, about, avatar, email, password: hash,
+  })).then((user) => res.send(user)) // тут деструктурировать, что бы отправлялось все кроме пароля
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя', error });
+        next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
+      if (error.code === MONGO_DUPLCATE_ERROR_CODE) {
+        next(new ConflictError('Такой пользователь уже существует'));
+      }
+      next(error);
     });
 };
 
-const updateProfile = (req, res, updateOption) => {
+const updateProfile = (req, res, updateOption, next) => {
   User.findByIdAndUpdate(req.user._id, updateOption, { runValidators: true, new: true })
     .then((user) => {
       if (!user) {
-        throw new Error('NotFound');
+        throw new NotFoundError('Пользователь с указанным id не найден');
       }
       res.send(user);
     })
     .catch((error) => {
-      if (error.message === 'NotFound') {
-        return res.status(NOT_FOUND).send({ message: 'Пользователь с указанным id не найден' });
-      }
       if (error.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении', error });
+        next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
+      next(error);
     });
 };
 
@@ -66,4 +73,36 @@ export const updateUser = (req, res) => {
 export const updateAvatar = (req, res) => {
   const avatarUrl = req.body;
   updateProfile(req, res, avatarUrl);
+};
+
+export const login = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findUserByCredentials(email, password);
+    const token = generateTtoken({ _id: user._id });
+    res.cookie('jwt', token, {
+      maxAge: 3600000, httpOnly: true, sameSite: true,
+    });
+    return res.send({ email: user.email });
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      return next(new BadRequestError('Переданы некорректные данные'));
+    }
+    if (error.message === 'NotAutanticate') {
+      return next(new AuthenticationError('Неправильные почта или пароль'));
+    }
+    return next(error);
+  }
+};
+
+export const getCurrentUser = (req, res, next) => {
+  const currentUser = req.user._id;
+  User.findById(currentUser)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь по указанному id не найден');
+      }
+      res.send(user);
+    })
+    .catch(next);
 };

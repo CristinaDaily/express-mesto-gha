@@ -1,66 +1,67 @@
 import Card from '../models/card.js';
-import HTTP_STATUS from '../errorStatus.js';
+import NotFoundError from '../errors/notFoundErr.js';
+import BadRequestError from '../errors/badRequestErr.js';
 
-const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } = HTTP_STATUS;
-export const getCards = (req, res) => {
+export const getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner'])
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', err }));
+    .catch(next);
 };
 
-export const createCard = (req, res) => {
+export const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании карточки', err });
+        next(new BadRequestError('Переданы некорректные данные при создании карточки'));
       }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', err });
+      next(err);
     });
 };
 
-export const deleteCardById = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+export const deleteCardById = (req, res, next) => {
+  const userId = req.user._id;
+
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new Error('NotFound');
+        throw new NotFoundError('Карточка с указанным id не найдена');
       }
-      res.send(card);
+
+      if (card.owner.toString() !== userId) {
+        throw new NotFoundError('Карточка с указанным id не найдена');
+      }
+      return Card.findByIdAndDelete(req.params.cardId);
     })
-    .catch((error) => {
-      if (error.message === 'NotFound') {
-        return res.status(NOT_FOUND).send({ message: 'Карточка с указанным id не найдена' });
-      }
+    .then((deletedCard) => {
+      res.send(deletedCard);
+    })
+    .catch(next);
+  /*
       if (error.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: 'Передан не валидный id' });
-      }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
-    });
+    } */
 };
 
-const updateCardLikes = (req, res, updateAction) => {
+const updateCardLikes = (req, res, updateAction, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     updateAction,
     { new: true },
   ).then((card) => {
     if (!card) {
-      throw new Error('NotFound');
+      throw new NotFoundError('Передан несуществующий _id карточки');
     }
     res.send(card);
   })
-    .catch((error) => {
-      if (error.message === 'NotFound') {
-        return res.status(NOT_FOUND).send({ message: 'Передан несуществующий _id карточки' });
-      }
+    .catch(next);
+  /*
       if (error.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: 'Передан не валидный id' });
-      }
-      return res.status(INTERNAL_SERVER_ERROR).send({ message: 'На сервере произошла ошибка', error });
-    });
+      } */
 };
 
 export const likeCard = (req, res) => {
