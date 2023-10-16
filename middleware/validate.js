@@ -19,7 +19,7 @@ const validateProfile = celebrate({
 
 const validateAvatar = celebrate({
   [Segments.BODY]: Joi.object().keys({
-    avarar: Joi.string().uri(),
+    avatar: Joi.string().uri(),
   }),
 });
 const validateObjId = celebrate({
