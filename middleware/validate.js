@@ -28,6 +28,12 @@ const validateObjId = celebrate({
   }),
 });
 
+const validateCardId = celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+});
+
 const validateLoginData = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -43,5 +49,5 @@ const validateCard = celebrate({
 });
 
 export {
-  validateUser, validateProfile, validateAvatar, validateObjId, validateLoginData, validateCard,
+  validateUser, validateProfile, validateAvatar, validateObjId, validateLoginData, validateCard,validateCardId,
 };
