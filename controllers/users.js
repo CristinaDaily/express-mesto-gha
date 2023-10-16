@@ -37,7 +37,11 @@ export const createUser = (req, res, next) => {
   } = req.body;
   bcrypt.hash(password, SOLT_ROUNDS).then((hash) => User.create({
     name, about, avatar, email, password: hash,
-  })).then((user) => res.send(user)) // тут деструктурировать, что бы отправлялось все кроме пароля
+  })).then((user) => {
+    const userWithourPassword = user.toObject();
+    delete userWithourPassword.password;
+    res.send(userWithourPassword);
+  })
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
