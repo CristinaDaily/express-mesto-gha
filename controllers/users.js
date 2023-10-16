@@ -76,7 +76,7 @@ export const updateUser = (req, res) => {
 
 export const updateAvatar = (req, res) => {
   const avatarUrl = req.body;
-  updateProfile(req, res, avatarUrl);
+  updateProfile(req, res, { $set: avatarUrl });
 };
 
 export const login = async (req, res, next) => {
