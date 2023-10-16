@@ -1,4 +1,4 @@
-import {celebrate, Joi, Segments} from 'celebrate';
+import { celebrate, Joi, Segments } from 'celebrate';
 
 const validateUser = celebrate({
   body: Joi.object().keys({
@@ -22,7 +22,7 @@ const validateAvatar = celebrate({
     avarar: Joi.string().uri(),
   }),
 });
-const validateId = celebrate({
+const validateObjId = celebrate({
   [Segments.PARAMS]: Joi.object().keys({
     userId: Joi.string().alphanum().length(24),
   }),
@@ -35,6 +35,13 @@ const validateLoginData = celebrate({
   }),
 });
 
+const validateCard = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().uri().required(),
+  }),
+});
+
 export {
-  validateUser, validateProfile, validateAvatar, validateId, validateLoginData,
+  validateUser, validateProfile, validateAvatar, validateObjId, validateLoginData, validateCard,
 };
