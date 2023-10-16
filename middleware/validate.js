@@ -49,5 +49,6 @@ const validateCard = celebrate({
 });
 
 export {
-  validateUser, validateProfile, validateAvatar, validateObjId, validateLoginData, validateCard,validateCardId,
+  validateUser, validateProfile, validateAvatar, validateObjId,
+  validateLoginData, validateCard, validateCardId,
 };
