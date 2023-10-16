@@ -1,9 +1,9 @@
 import express, { json } from 'express';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
+import { errors } from 'celebrate';
 import router from './routes/index.js';
 import errorHandler from './middleware/errorHandler.js';
-import { errors } from 'celebrate';
 
 const { PORT = 3000, MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
