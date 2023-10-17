@@ -64,4 +64,9 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(email,
     });
 };
 
+userSchema.path('avatar').validate((v) => {
+  const urlRegex = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9!@#\\$%\\^\\&*\\)\\(+=._-]{2,})?(#?)$/;
+  return urlRegex.test(v);
+});
+
 export default mongoose.model('user', userSchema);
