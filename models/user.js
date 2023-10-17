@@ -19,6 +19,14 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+      validate: {
+        validator: function validateAvatar(v) {
+          const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,3}(:\d{1,5})?([/?#]\S*)?$/;
+          console.log(urlRegex.test(v));
+          return urlRegex.test(v);
+        },
+        message: (props) => `${props.value} is not a valid avatar link`,
+      },
     },
     email: {
       type: String,
@@ -63,10 +71,11 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(email,
         });
     });
 };
-
+/*
 userSchema.path('avatar').validate((v) => {
-  const urlRegex = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9!@#\\$%\\^\\&*\\)\\(+=._-]{2,})?(#?)$/;
+  const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,3}(:\d{1,5})?([/?#]\S*)?$/;
+  console.log(urlRegex.test(v));
   return urlRegex.test(v);
-});
+}); */
 
 export default mongoose.model('user', userSchema);
