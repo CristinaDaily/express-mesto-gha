@@ -1,6 +1,7 @@
 import Card from '../models/card.js';
 import NotFoundError from '../errors/notFoundErr.js';
 import BadRequestError from '../errors/badRequestErr.js';
+import ForbiddenError from '../errors/forbiddenError.js'
 
 export const getCards = (req, res, next) => {
   Card.find({})
@@ -32,7 +33,7 @@ export const deleteCardById = (req, res, next) => {
       }
 
       if (card.owner.toString() !== userId) {
-        throw new NotFoundError('Карточка с указанным id не найдена');
+        throw new ForbiddenError('Невозможно удалить карточки другого пользователя');
       }
       return Card.findByIdAndDelete(req.params.cardId);
     })
