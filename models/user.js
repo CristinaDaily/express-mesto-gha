@@ -22,7 +22,6 @@ const userSchema = new mongoose.Schema(
       validate: {
         validator: function validateAvatar(v) {
           const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,3}(:\d{1,5})?([/?#]\S*)?$/;
-          console.log(urlRegex.test(v));
           return urlRegex.test(v);
         },
         message: (props) => `${props.value} is not a valid avatar link`,
