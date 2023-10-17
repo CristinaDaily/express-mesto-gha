@@ -1,7 +1,7 @@
 import Card from '../models/card.js';
 import NotFoundError from '../errors/notFoundErr.js';
 import BadRequestError from '../errors/badRequestErr.js';
-import ForbiddenError from '../errors/forbiddenError.js'
+import ForbiddenError from '../errors/forbiddenError.js';
 
 export const getCards = (req, res, next) => {
   Card.find({})
