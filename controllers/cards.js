@@ -64,10 +64,10 @@ const updateCardLikes = (req, res, updateAction, next) => {
       } */
 };
 
-export const likeCard = (req, res) => {
-  updateCardLikes(req, res, { $addToSet: { likes: req.user._id } });
+export const likeCard = (req, res, next) => {
+  updateCardLikes(req, res, { $addToSet: { likes: req.user._id } }, next);
 };
 
-export const dislikeCard = (req, res) => {
-  updateCardLikes(req, res, { $pull: { likes: req.user._id } });
+export const dislikeCard = (req, res, next) => {
+  updateCardLikes(req, res, { $pull: { likes: req.user._id } }, next);
 };
