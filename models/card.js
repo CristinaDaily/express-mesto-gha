@@ -11,6 +11,13 @@ const cardSchema = new mongoose.Schema(
     link: {
       type: String,
       required: true,
+      validate: {
+        validator: function validateAvatar(v) {
+          const urlRegex = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,3}(:\d{1,5})?([/?#]\S*)?$/;
+          return urlRegex.test(v);
+        },
+        message: (props) => `${props.value} is not a valid avatar link`,
+      },
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
